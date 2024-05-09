@@ -27,6 +27,7 @@ jobs:
          DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
          DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN_DEV}}
          DATABRICKS_BUNDLE_ENV: development
+         environment: ${{github.event.inputs.Environment}}
 
   # Validate, deploy, and then run the bundle.
   pipeline_update:
@@ -52,3 +53,4 @@ jobs:
          DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
          DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN_DEV}}
          DATABRICKS_BUNDLE_ENV: development
+         environment: ${{github.event.inputs.Environment}}
