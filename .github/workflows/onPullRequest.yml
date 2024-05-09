@@ -6,42 +6,49 @@ on:
     types: [assigned, opened, synchronize, reopened]
 
 jobs:
-  linting:
+
+  deploy:
+    name: "Deploy bundle"
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-python@v2
+      # Check out this repo, so that this workflow can access it.
+      - uses: actions/checkout@v3
 
-      - name: Installing Dependancies
-        run: |
-          pip install -r ./unit-testing-requirements.txt
-      
-      - name: Running flake8
-        run: flake8 --ignore=C901,E402,E999,F821,F403,F405 --max-line-length=127 ./src/main/python
+      # Download the Databricks CLI.
+      # See https://github.com/databricks/setup-cli
+      - uses: databricks/setup-cli@main
 
-  run-unit-tests:
-   needs:
-     - linting
-   runs-on: ubuntu-latest
-   
-   steps:
-     - name: Checkout repo
-       uses: actions/checkout@v2
-     - name: Run a databricks notebook
-       uses: databricks/run-notebook@v0
-       with:
-         local-notebook-path: ./src/main/tests/test_all.py
-         notebook-params-json: >
-           {
-             "num_rows":"1000",
-             "env":"local"
-           }
-         databricks-host: ${{secrets.DATABRICKS_HOST_PRD}}
-         databricks-token: ${{secrets.DATABRICKS_TOKEN_PRD}}
-         new-cluster-json: >
-           {
-             "num_workers": 1,
-             "spark_version": "11.3.x-scala2.12",
-             "node_type_id": "i3.xlarge"
-           }
+      # Deploy the bundle to the "qa" target as defined
+      # in the bundle's settings file.
+      - run: databricks bundle deploy
+        working-directory: .
+        env:
+         DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
+         DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN_DEV}}
+         DATABRICKS_BUNDLE_ENV: development
+
+  # Validate, deploy, and then run the bundle.
+  pipeline_update:
+    name: "Run pipeline update"
+    runs-on: ubuntu-latest
+
+    # Run the "deploy" job first.
+    needs:
+      - deploy
+
+    steps:
+      # Check out this repo, so that this workflow can access it.
+      - uses: actions/checkout@v3
+
+      # Use the downloaded Databricks CLI.
+      - uses: databricks/setup-cli@main
+
+      # Run the Databricks workflow named "my-job" as defined in the
+      # bundle that was just deployed.
+      - run: databricks bundle run -t development dlt-streaming-sp-edg-demo-pipeline 
+        working-directory: .
+        env:
+         databricks-host: ${{secrets.DATABRICKS_HOST_DEV}}
+         databricks-token: ${{secrets.DATABRICKS_TOKEN_DEV}}
+         DATABRICKS_BUNDLE_ENV: development
