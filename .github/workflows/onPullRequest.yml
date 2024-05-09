@@ -49,6 +49,6 @@ jobs:
       - run: databricks bundle run -t development dlt-streaming-sp-edg-demo-pipeline 
         working-directory: .
         env:
-         databricks-host: ${{secrets.DATABRICKS_HOST_DEV}}
-         databricks-token: ${{secrets.DATABRICKS_TOKEN_DEV}}
+         DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
+         DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN_DEV}}
          DATABRICKS_BUNDLE_ENV: development
