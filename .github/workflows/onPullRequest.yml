@@ -26,7 +26,8 @@ jobs:
         env:
          DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
          DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN_DEV}}
-         DATABRICKS_BUNDLE_ENV: development
+         environment: ${{github.event.inputs.development}}
+         DATABRICKS_BUNDLE_ENV: ${{github.event.inputs.development}}
 
   # Validate, deploy, and then run the bundle.
   pipeline_update:
@@ -46,9 +47,10 @@ jobs:
 
       # Run the Databricks workflow named "my-job" as defined in the
       # bundle that was just deployed.
-      - run: databricks bundle run -t development dlt-streaming-sp-edg-demo-pipeline 
+      - run: databricks bundle run dlt-streaming-sp-edg-demo-pipeline
         working-directory: .
         env:
          DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
          DATABRICKS_TOKEN: ${{secrets.DATABRICKS_TOKEN_DEV}}
-         DATABRICKS_BUNDLE_ENV: development
+         environment: ${{github.event.inputs.development}}
+         DATABRICKS_BUNDLE_ENV: ${{github.event.inputs.development}}
