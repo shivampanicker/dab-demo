@@ -21,7 +21,7 @@ jobs:
 
       # Deploy the bundle to the "qa" target as defined
       # in the bundle's settings file.
-      - run: databricks bundle deploy
+      - run: databricks bundle deploy -t development --profile DEFAULT
         working-directory: .
         env:
          DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
@@ -46,7 +46,7 @@ jobs:
 
       # Run the Databricks workflow named "my-job" as defined in the
       # bundle that was just deployed.
-      - run: databricks bundle run -t development dlt-streaming-sp-edg-demo-pipeline 
+      - run: databricks bundle run -t development dlt-streaming-sp-edg-demo-pipeline --profile DEFAULT
         working-directory: .
         env:
          DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST_DEV}}
