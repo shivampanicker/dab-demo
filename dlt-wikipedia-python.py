@@ -12,3 +12,5 @@ json_path = "/databricks-datasets/wikipedia-datasets/data-001/clickstream/raw-un
 def clickstream_raw():
     return (spark.read.format("json").load(json_path))
 
+
+# added comment
